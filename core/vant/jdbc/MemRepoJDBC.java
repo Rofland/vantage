@@ -9,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
-import org.json.JSONException;
-
 import vant.Misc;
 import vant.Mold;
 import vant.app.Persisted;
@@ -27,7 +25,7 @@ public class MemRepoJDBC<T extends Tuple> extends MemRepo<T> implements
 	protected final vant.lang.Writer _writer = new BufferWriter(_bin);
 	protected final InputStream _bufferInput = Misc.input(_bin);
 
-	public MemRepoJDBC(Mold<T> m) throws JSONException {
+	public MemRepoJDBC(Mold<T> m) {
 		super(m);
 	}
 

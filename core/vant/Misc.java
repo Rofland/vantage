@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 public class Misc {
 	public static int compare(double x, double y) {
 		return x == y ? 0 : x < y ? -1 : 1;
@@ -87,11 +85,6 @@ public class Misc {
 		src.rewind();
 		dst.put(src);
 		src.position(pos);
-	}
-
-	public static JSONObject opt(JSONObject json, String key) {
-		JSONObject obj = json.optJSONObject(key);
-		return obj == null ? new JSONObject() : obj;
 	}
 
 	public static boolean equals(CharSequence a, int apos, CharSequence b,
