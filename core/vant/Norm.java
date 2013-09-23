@@ -1,8 +1,24 @@
 package vant;
 
 public class Norm {
+
+	public static boolean isPrimitive(Object v) {
+		return v instanceof Boolean || v instanceof Byte
+				|| v instanceof Character || v instanceof Short
+				|| v instanceof Integer || v instanceof Long
+				|| v instanceof Float || v instanceof Double;
+	}
+
 	public static boolean BOOL(Object raw) {
 		return BOOL(raw, false);
+	}
+
+	public static byte BYTE(Object raw) {
+		return BYTE(raw, (byte) 0);
+	}
+
+	public static char CHAR(Object raw) {
+		return CHAR(raw, '\0');
 	}
 
 	public static short SHORT(Object raw) {
@@ -44,6 +60,31 @@ public class Norm {
 				return false;
 			else
 				return opt;
+		} else
+			return opt;
+	}
+
+	public static byte BYTE(Object raw, byte opt) {
+		if (raw == null)
+			return opt;
+		else if (raw instanceof Number)
+			return ((Number) raw).byteValue();
+		else if (raw instanceof String)
+			return Byte.decode((String) raw);
+		else
+			return opt;
+	}
+
+	public static char CHAR(Object raw, char opt) {
+		if (raw == null)
+			return opt;
+		else if (raw instanceof Character)
+			return ((Character) raw).charValue();
+		else if (raw instanceof Number)
+			return (char) ((Number) raw).shortValue();
+		else if (raw instanceof CharSequence) {
+			CharSequence s = (CharSequence) raw;
+			return s.length() > 0 ? s.charAt(0) : opt;
 		} else
 			return opt;
 	}

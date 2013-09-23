@@ -1,6 +1,7 @@
 package vant;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -72,6 +73,15 @@ public class Misc {
 		};
 	}
 
+	public static OutputStream output(final ByteBuffer bb) {
+		return new OutputStream() {
+			@Override
+			public void write(int b) {
+				bb.put((byte) b);
+			}
+		};
+	}
+
 	public static void copy(ByteBuffer src, ByteBuffer dst) {
 		int pos = src.position();
 		src.rewind();
@@ -107,12 +117,16 @@ public class Misc {
 		return true;
 	}
 
+	public static final long MAX_CLONG = 1L << 53;
+	public static final long MIN_CLONG = -MAX_CLONG;
+
 	public static final byte[] ZERO_BYTE = new byte[0];
 	public static final short[] ZERO_SHORT = new short[0];
 	public static final int[] ZERO_INT = new int[0];
 	public static final long[] ZERO_LONG = new long[0];
 	public static final float[] ZERO_FLOAT = new float[0];
 	public static final double[] ZERO_DOUBLE = new double[0];
+	public static final Object[] ZERO_OBJECT = new Object[0];
 	public static final String[] ZERO_STRING = new String[0];
 	public static final Map<String, Object> ZERO_MAP = Collections
 			.unmodifiableMap(new HashMap<String, Object>());

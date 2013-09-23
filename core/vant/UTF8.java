@@ -20,9 +20,9 @@ public final class UTF8 {
 		}
 	};
 
-	public static int length(CharSequence s) {
+	public static int length(CharSequence s, int start, int end) {
 		int length = 0;
-		for (int i = 0; i < s.length(); i++) {
+		for (int i = start; i < end; i++) {
 			char c = s.charAt(i);
 			if (c < 0x80)
 				length += 1;
@@ -36,6 +36,8 @@ public final class UTF8 {
 
 	public static String read(ByteBuffer bin) {
 		short n = bin.getShort();
+		if (n == 0)
+			return "";
 		if (bin.hasArray())
 			return new String(bin.array(), bin.arrayOffset() + bin.position(),
 					n, CHARSET);
@@ -46,6 +48,8 @@ public final class UTF8 {
 
 	public static String read(DataInput in) throws IOException {
 		short n = in.readShort();
+		if (n == 0)
+			return "";
 		StringBuilder sb = builder.get();
 		sb.setLength(0);
 		for (int i = 0; i < n; i++) {
@@ -68,10 +72,9 @@ public final class UTF8 {
 		return sb.toString();
 	}
 
-	public static void write(ByteBuffer bin, CharSequence s) {
-		bin.putShort((short)length(s));
-		int n = s.length();
-		for (int i = 0; i < n; i++) {
+	public static void write(ByteBuffer bin, CharSequence s, int start, int end) {
+		bin.putShort((short) length(s, start, end));
+		for (int i = start; i < end; i++) {
 			char c = s.charAt(i);
 			if (c < 0x80) {
 				bin.put((byte) c);
@@ -86,10 +89,10 @@ public final class UTF8 {
 		}
 	}
 
-	public static void write(DataOutput out, CharSequence s) throws IOException {
-		out.writeShort((short)length(s));
-		int n = s.length();
-		for (int i = 0; i < n; i++) {
+	public static void write(DataOutput out, CharSequence s, int start, int end)
+			throws IOException {
+		out.writeShort((short) length(s, start, end));
+		for (int i = start; i < end; i++) {
 			char c = s.charAt(i);
 			if (c < 0x80) {
 				out.write(c);

@@ -22,10 +22,10 @@ public class Silently {
 		return array;
 	}
 	
-	public static <T> T[] create(T[] array, Class<T> clazz) {
-		for (int i = 0; i < array.length; i++)
+	public static <T> void create(Class<T> clazz, T[] array, int offset, int n) {
+		int end = offset + n;
+		for (int i = offset; i < end; i++)
 			array[i] = Silently.create(clazz);
-		return array;
 	}
 
 	public static void close(Closeable... array) {
