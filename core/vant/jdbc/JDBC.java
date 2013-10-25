@@ -24,4 +24,10 @@ public class JDBC extends Conf {
 	public Connection connect() throws SQLException {
 		return DriverManager.getConnection(url, user, pswd);
 	}
+
+	public void erase() throws SQLException {
+		Connection c = connect();
+		c.createStatement().executeUpdate("DROP TABLE " + table);
+		c.close();
+	}
 }

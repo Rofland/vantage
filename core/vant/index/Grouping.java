@@ -38,7 +38,7 @@ public final class Grouping implements Countable {
 	}
 
 	public final int list(int key, int from, int size, int[] ids) {
-		size = Math.min(size, _sizes[key] - from);
+		size = key < _sizes.length ? Math.min(size, _sizes[key] - from) : 0;
 		if (from >= size)
 			return 0;
 		int index = 0;

@@ -58,7 +58,7 @@ public class ThickLinkJDBC extends ThickLink implements Persisted<JDBC> {
 		Statement sql = conn.createStatement();
 		sql.execute("CREATE TABLE " + _conf.table
 				+ "(src INT, dst INT, PRIMARY KEY(src, dst)");
-		Silently.close(conn);
+		conn.close();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ThickLinkJDBC extends ThickLink implements Persisted<JDBC> {
 		Connection conn = _conf.connect();
 		Statement sql = conn.createStatement();
 		sql.execute("DROP TABLE " + _conf.table);
-		Silently.close(conn);
+		conn.close();
 	}
 
 	@Override
