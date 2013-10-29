@@ -19,6 +19,7 @@ public class JsonPortalRPC extends SyntacticPortal {
 	protected Object _rpcID;
 	protected Struct _rqst, _params;
 	protected String _method;
+	protected Writer _out;
 	protected vant.lang.Writer _resp;
 	protected vant.lang.json.Parser _parser = new vant.lang.json.Parser();
 	protected CatalogReader _catalog = new CatalogReader();
@@ -34,12 +35,13 @@ public class JsonPortalRPC extends SyntacticPortal {
 
 	protected final void endResponse() throws IOException {
 		_resp.end();
-		_resp.flush();
+		_out.flush();
 	}
 
 	@Override
 	public void exec(Reader in, Writer out) throws IOException {
 		_rqst = null;
+		_out = out;
 		_resp = new vant.lang.json.Writer(out);
 		Action action = null;
 		try {
