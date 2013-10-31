@@ -63,16 +63,4 @@ public class MemRepo<T extends Tuple> extends Repo<T> {
 		n = Math.max(n, _tuples.length + 128);
 		_tuples = Arrays.copyOf(_tuples, n);
 	}
-
-	@Override
-	public void scan(int offset, int length, Peek<T> peek) throws Exception {
-		offset = Math.max(0, offset);
-		int end = Math.min(_count, offset + length);
-		T tuple = mold.create();
-		for (int i = offset; i < end; i++) {
-			int id = i + 1;
-			mold.copy(_tuples[i], tuple);
-			peek.at(id, tuple);
-		}
-	}
 }

@@ -4,25 +4,25 @@ import java.io.IOException;
 
 import vant.Ensure;
 import vant.Usage;
-import vant.index.Grouping;
 import vant.lang.Exchange;
 import vant.lang.Reader;
 import vant.lang.Writer;
+import vant.model.Div;
 
 public class GroupSlice extends Magician {
-	protected final Grouping _grouping;
+	protected final Div _div;
 	protected int _offset;
 	protected byte _size;
 	protected int _group;
 
-	public GroupSlice(Grouping g, Magic m) {
+	public GroupSlice(Div div, Magic m) {
 		super(m, Byte.MAX_VALUE);
-		_grouping = g;
+		_div = div;
 	}
 
 	@Override
 	public void perform() throws Exception {
-		_count = _grouping.list(_group, _offset, _size, _ids);
+		_count = _div.rlist(_group, _offset, _size, _ids);
 		_magic.turn(_ids, 0, _count);
 	}
 

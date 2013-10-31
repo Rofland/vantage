@@ -24,7 +24,4 @@ public abstract class Repo<T extends Tuple> {
 			throws Exception;
 
 	public abstract boolean read(int id, T tuple) throws Exception;
-
-	public abstract void scan(int offset, int length, Peek<T> op)
-			throws Exception;
 }

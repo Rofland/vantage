@@ -4,19 +4,19 @@ import java.io.IOException;
 
 import vant.Ensure;
 import vant.Usage;
-import vant.index.Grouping;
 import vant.lang.Exchange;
 import vant.lang.Reader;
 import vant.lang.Writer;
+import vant.model.Div;
 
 public class GroupPath extends Magician {
-	protected final Grouping _tree;
+	protected final Div _tree;
 	protected int _seed;
 	protected byte _hop;
 
-	public GroupPath(Grouping g, Magic m) {
+	public GroupPath(Div div, Magic m) {
 		super(m, Byte.MAX_VALUE);
-		_tree = g;
+		_tree = div;
 	}
 
 	@Override

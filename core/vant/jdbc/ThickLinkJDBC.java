@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
-import vant.Silently;
 import vant.app.Persisted;
 import vant.model.ThickLink;
 
@@ -42,7 +41,7 @@ public class ThickLinkJDBC extends ThickLink implements Persisted<JDBC> {
 
 		rs = sql.executeQuery("SELECT * FROM " + _conf.table);
 		while (rs.next())
-			join(rs.getInt("src"), rs.getInt("dst"));
+			put(rs.getInt("src"), rs.getInt("dst"));
 		rs.close();
 		sql.close();
 

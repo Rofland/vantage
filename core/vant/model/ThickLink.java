@@ -9,61 +9,60 @@ public class ThickLink extends Link {
 	public int[][] _groups = new int[0][];
 	public int[] _sizes = Misc.ZERO_INT;
 
-	protected void save(int src, int dst) throws Exception {
+	protected void save(int k, int v) throws Exception {
 	}
 
-	protected void delete(int src, int dst) throws Exception {
+	protected void delete(int k, int v) throws Exception {
 	}
 
 	@Override
-	public void join(int src, int dst) throws Exception {
+	public void put(int k, int v) throws Exception {
 		int oldLength = _groups.length;
-		if (src > _groups.length) {
-			int n = (src & 0xffffffc0) + 64;
+		if (k > _groups.length) {
+			int n = (k & 0xffffffc0) + 64;
 			_groups = Arrays.copyOf(_groups, n);
 			_sizes = Arrays.copyOf(_sizes, n);
 			while (oldLength < n)
 				_groups[oldLength++] = Misc.ZERO_INT;
 		}
-		int[] group = _groups[src - 1];
-		int index = Arrays.binarySearch(group, dst);
+		int[] group = _groups[k - 1];
+		int index = Arrays.binarySearch(group, v);
 		if (index >= 0)
 			return;
-		save(src, dst);
+		save(k, v);
 		index = -index - 1;
-		group = Misc.reserve(group, _sizes[src - 1], index, 1, 16);
-		group[index] = dst;
-		_groups[src - 1] = group;
-		_sizes[src - 1]++;
+		group = Misc.reserve(group, _sizes[k - 1], index, 1, 16);
+		group[index] = v;
+		_groups[k - 1] = group;
+		_sizes[k - 1]++;
 	}
 
 	@Override
-	public void chop(int src, int dst) throws Exception {
-		if (src > _groups.length)
+	public void cut(int k, int v) throws Exception {
+		if (k > _groups.length)
 			return;
-		int[] group = _groups[src - 1];
-		int index = Arrays.binarySearch(group, 0, _sizes[src - 1], dst);
+		int[] group = _groups[k - 1];
+		int index = Arrays.binarySearch(group, 0, _sizes[k - 1], v);
 		if (index < 0)
 			return;
-		delete(src, dst);
-		_sizes[src - 1]--;
-		System.arraycopy(group, index + 1, group, index, _sizes[src - 1]
-				- index);
+		delete(k, v);
+		_sizes[k - 1]--;
+		System.arraycopy(group, index + 1, group, index, _sizes[k - 1] - index);
 	}
 
 	@Override
-	public int countOf(int src) {
-		return src > _sizes.length ? 0 : _sizes[src - 1];
+	public int countOf(int k) {
+		return k > _sizes.length ? 0 : _sizes[k - 1];
 	}
 
 	@Override
-	public int list(int src, int from, int size, int[] dsts) throws Exception {
-		if (src > _sizes.length || _sizes[src - 1] <= from)
+	public int list(int k, int from, int size, int[] vs) throws Exception {
+		if (k > _sizes.length || _sizes[k - 1] <= from)
 			return 0;
-		int[] group = _groups[src - 1];
-		int count = Math.min(size, _sizes[src - 1] - from);
+		int[] group = _groups[k - 1];
+		int count = Math.min(size, _sizes[k - 1] - from);
 		for (int i = 0; i < count; i++)
-			dsts[i] = group[from + i];
+			vs[i] = group[from + i];
 		return count;
 	}
 }
