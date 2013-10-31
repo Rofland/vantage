@@ -80,6 +80,7 @@ public class JsonPortalRPC extends SyntacticPortal {
 			notFound(_method);
 			return;
 		}
+		action.cleanup();
 		_params = _rqst.struct("params", PARAM_EMPTY);
 		_catalog.root(_params);
 
