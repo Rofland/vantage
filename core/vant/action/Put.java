@@ -5,7 +5,7 @@ import java.io.IOException;
 import vant.Ensure;
 import vant.Usage;
 import vant.Violation;
-import vant.lang.Reader;
+import vant.lang.Exchange;
 import vant.lang.Writer;
 import vant.model.Relation;
 import vant.model.Repo;
@@ -40,13 +40,13 @@ public class Put extends Action {
 	}
 
 	@Override
-	public void decode(Reader r) throws IOException, Usage {
+	public void decode(Exchange r) throws IOException, Usage {
 		_k = Ensure.id("key", r.INT("key", 0));
 		_v = Ensure.id("value", r.INT("value", 0));
 	}
 
 	@Override
-	public void encode(Writer w) throws IOException {
+	public void encode(Exchange w) throws IOException {
 		w.INT("key", _k);
 		w.INT("value", _v);
 	}

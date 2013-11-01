@@ -6,8 +6,6 @@ import vant.Ensure;
 import vant.Usage;
 import vant.index.Rank;
 import vant.lang.Exchange;
-import vant.lang.Reader;
-import vant.lang.Writer;
 
 public class RankSlice extends Magician {
 	protected final Rank _rank;
@@ -37,12 +35,12 @@ public class RankSlice extends Magician {
 	}
 
 	@Override
-	public void decode(Reader r) throws IOException {
+	public void decode(Exchange r) throws IOException {
 		exchange(r, 0, (byte) 10);
 	}
 
 	@Override
-	public void encode(Writer w) throws IOException {
+	public void encode(Exchange w) throws IOException {
 		exchange(w, _offset, _size);
 	}
 

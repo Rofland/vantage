@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import vant.Ensure;
 import vant.Usage;
-import vant.lang.Reader;
+import vant.lang.Exchange;
 import vant.lang.Writer;
 import vant.model.Repo;
 import vant.model.Tuple;
@@ -40,13 +40,13 @@ public class Update<T extends Tuple> extends Action {
 	}
 
 	@Override
-	public void decode(Reader r) throws IOException, Usage {
+	public void decode(Exchange r) throws IOException, Usage {
 		_id = r.INT("id", 0);
 		_tuple.decode(r);
 	}
 
 	@Override
-	public void encode(Writer w) throws IOException {
+	public void encode(Exchange w) throws IOException {
 		w.INT("id", _id);
 		_tuple.encode(w);
 	}

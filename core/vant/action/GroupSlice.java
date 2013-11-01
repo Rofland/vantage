@@ -5,8 +5,6 @@ import java.io.IOException;
 import vant.Ensure;
 import vant.Usage;
 import vant.lang.Exchange;
-import vant.lang.Reader;
-import vant.lang.Writer;
 import vant.model.Div;
 
 public class GroupSlice extends Magician {
@@ -39,12 +37,12 @@ public class GroupSlice extends Magician {
 	}
 
 	@Override
-	public void decode(Reader r) throws IOException {
+	public void decode(Exchange r) throws IOException {
 		exchange(r, 0, 0, (byte) 10);
 	}
 
 	@Override
-	public void encode(Writer w) throws IOException {
+	public void encode(Exchange w) throws IOException {
 		exchange(w, _group, _offset, _size);
 	}
 
