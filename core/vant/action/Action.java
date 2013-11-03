@@ -20,5 +20,5 @@ public abstract class Action {
 
 	public abstract void encode(Exchange w) throws IOException;
 
-	public abstract void result(String key, Writer w) throws IOException;
+	public abstract void result(Writer w) throws IOException;
 }

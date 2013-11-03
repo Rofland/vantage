@@ -5,68 +5,73 @@ import java.nio.ByteBuffer;
 
 import vant.UTF8;
 
-public class BufferWriter implements Writer {
+public class BufferWriter extends Writer {
 	public ByteBuffer buffer;
 	protected int _depth = 0;
 
 	public BufferWriter(ByteBuffer b) {
 		buffer = b;
 	}
-	
+
 	@Override
-	public boolean BOOL(String k, boolean v) throws IOException {
+	public Writer key(String k) throws IOException {
+		return this;
+	}
+
+	@Override
+	public Writer BOOL(boolean v) throws IOException {
 		buffer.put((byte) (v ? 1 : 0));
-		return v;
+		return this;
 	}
 
 	@Override
-	public byte BYTE(String k, byte v) throws IOException {
+	public Writer BYTE(byte v) throws IOException {
 		buffer.put(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public char CHAR(String k, char v) throws IOException {
+	public Writer CHAR(char v) throws IOException {
 		buffer.putChar(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public short SHORT(String k, short v) throws IOException {
+	public Writer SHORT(short v) throws IOException {
 		buffer.putShort(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public int INT(String k, int v) throws IOException {
+	public Writer INT(int v) throws IOException {
 		buffer.putInt(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public long LONG(String k, long v) throws IOException {
+	public Writer LONG(long v) throws IOException {
 		buffer.putLong(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public float FLOAT(String k, float v) throws IOException {
+	public Writer FLOAT(float v) throws IOException {
 		buffer.putFloat(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public double DOUBLE(String k, double v) throws IOException {
+	public Writer DOUBLE(double v) throws IOException {
 		buffer.putDouble(v);
-		return v;
+		return this;
 	}
 
 	@Override
-	public String STRING(String k, String v) throws IOException {
+	public Writer STRING(String v) throws IOException {
 		if (v == null)
 			v = "";
 		UTF8.write(buffer, v, 0, v.length());
-		return v;
+		return this;
 	}
 
 	@Override
@@ -75,23 +80,33 @@ public class BufferWriter implements Writer {
 	}
 
 	@Override
-	public void object(String k, boolean compact) throws IOException {
+	public Writer object() throws IOException {
 		_depth++;
+		return this;
+	}
+	
+	@Override
+	public Writer tuple() throws IOException {
+		_depth++;
+		return this;
 	}
 
 	@Override
-	public void array(String k, int n) throws IOException {
+	public Writer array(int n) throws IOException {
 		buffer.putInt(n);
 		_depth++;
+		return this;
 	}
 
 	@Override
-	public void end() throws IOException {
+	public Writer end() throws IOException {
 		if (_depth > 0)
 			_depth--;
+		return this;
 	}
 
 	@Override
-	public void flush() throws IOException {
+	public Writer flush() throws IOException {
+		return this;
 	}
 }

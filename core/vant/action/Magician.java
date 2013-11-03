@@ -33,10 +33,10 @@ public abstract class Magician extends Action {
 	}
 
 	@Override
-	public void result(String k, Writer w) throws IOException {
-		w.array(k, _count);
+	public void result(Writer w) throws IOException {
+		w.array(_count);
 		for (int i = 0; i < _count; i++) {
-			w.object(k, true);
+			w.tuple();
 			w.INT("id", _ids[i]);
 			_magic.prestige(i, w);
 			w.end();

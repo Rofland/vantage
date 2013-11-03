@@ -52,7 +52,7 @@ public class Put extends Action {
 	}
 
 	@Override
-	public void result(String key, Writer w) throws IOException {
-		w.BOOL(key, true);
+	public void result(Writer w) throws IOException {
+		w.BOOL(true);
 	}
 }

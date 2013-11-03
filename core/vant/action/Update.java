@@ -25,8 +25,8 @@ public class Update<T extends Tuple> extends Action {
 	}
 
 	@Override
-	public void result(String k, Writer w) throws IOException {
-		w.BOOL(k, true);
+	public void result(Writer w) throws IOException {
+		w.BOOL(true);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class JsonPortalRPC extends SyntacticPortal {
 	protected CatalogReader _catalog = new CatalogReader();
 
 	protected final void beginResponse() throws IOException {
-		_resp.object("response", false);
+		_resp.object();
 		_resp.STRING("jsonrpc", "2.0");
 		if (_rpcID instanceof String)
 			_resp.STRING("id", _rpcID.toString());
@@ -104,7 +104,8 @@ public class JsonPortalRPC extends SyntacticPortal {
 		}
 
 		beginResponse();
-		action.result("result", _resp);
+		_resp.key("result");
+		action.result(_resp);
 		endResponse();
 	}
 
@@ -131,7 +132,7 @@ public class JsonPortalRPC extends SyntacticPortal {
 	@Override
 	protected final void violation(int type, String hint) throws IOException {
 		beginResponse();
-		_resp.object("error", false);
+		_resp.key("error").object();
 		_resp.INT("code", -32603);
 		_resp.STRING("message", hint);
 		_resp.INT("data", type);
@@ -152,7 +153,8 @@ public class JsonPortalRPC extends SyntacticPortal {
 	protected final void error(int code, String msg, String data)
 			throws IOException {
 		beginResponse();
-		_resp.object("error", false);
+		_resp.key("error");
+		_resp.object();
 		_resp.INT("code", code);
 		_resp.STRING("message", msg);
 		_resp.STRING("data", data);

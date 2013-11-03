@@ -1,103 +1,112 @@
 package vant.lang.json;
 
 import java.io.IOException;
-import java.util.BitSet;
+import java.util.Arrays;
 
 import vant.Misc;
 import vant.lang.LangError;
 
-public class Writer implements vant.lang.Writer {
-	private static final int maxdepth = 200;
-	private boolean _comma = false;
-	protected char _mode = 'i';
-	private final BitSet _stack = new BitSet();
-	private int _depth = 0;
+public class Writer extends vant.lang.Writer {
+	protected boolean _comma = false;
+	protected boolean _kv = false;
+	protected boolean[] _nest = new boolean[8];
+	protected int _depth = 0;
 	protected Appendable _dst;
 
 	public Writer(Appendable appender) {
 		this._dst = appender;
+		_nest[0] = false;
 	}
 
-	private void newline() throws IOException {
-		_dst.append('\n');
-		for (int i = 0; i < _depth; i++)
-			_dst.append('\t');
-	}
-
-	private void value(String k, String v, boolean quote) throws IOException {
+	private void value(String v, boolean quote) throws IOException {
+		if (_kv)
+			throw new LangError(Json.LANG, "Unexpected value");
 		if (_comma)
 			_dst.append(',');
-		switch (_mode) {
-		case 'o':
-			if (k == null || k.length() == 0)
-				throw new LangError(Json.LANG, "Key must be non-empty string.");
+		if (quote)
+			Json.quote(v, _dst);
+		else
+			_dst.append(v);
+		finish();
+	}
+
+	private void finish() throws IOException {
+		if (_depth == 0) {
+			_comma = _kv = false;
+			_dst.append('\n');
+		} else {
+			_comma = true;
+			_kv = _nest[_depth - 1];
+		}
+	}
+
+	@Override
+	public Writer key(String k) throws IOException {
+		if (k == null || k.length() == 0)
+			throw new LangError(Json.LANG, "Key must be non-empty string.");
+		if (_comma)
+			_dst.append(',');
+		if (_kv) {
 			Json.quote(k, _dst);
 			_dst.append(':');
-		case 'a':
-			if (quote)
-				Json.quote(v, _dst);
-			else
-				_dst.append(v);
-			break;
-		default:
-			throw new LangError(Json.LANG, "Misplaced primitive.");
 		}
-		_comma = true;
+		_comma = _kv = false;
+		return this;
 	}
 
 	@Override
-	public boolean BOOL(String k, boolean v) throws IOException {
-		value(k, Boolean.toString(v), false);
-		return v;
+	public Writer BOOL(boolean v) throws IOException {
+		value(Boolean.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public byte BYTE(String k, byte v) throws IOException {
-		value(k, Byte.toString(v), false);
-		return v;
+	public Writer BYTE(byte v) throws IOException {
+		value(Byte.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public char CHAR(String k, char v) throws IOException {
-		value(k, Character.toString(v), true);
-		return v;
+	public Writer CHAR(char v) throws IOException {
+		value(Character.toString(v), true);
+		return this;
 	}
 
 	@Override
-	public short SHORT(String k, short v) throws IOException {
-		value(k, Short.toString(v), false);
-		return v;
+	public Writer SHORT(short v) throws IOException {
+		value(Short.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public int INT(String k, int v) throws IOException {
-		value(k, Integer.toString(v), false);
-		return v;
+	public Writer INT(int v) throws IOException {
+		value(Integer.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public long LONG(String k, long v) throws IOException {
+	public Writer LONG(long v) throws IOException {
 		boolean quote = v < Misc.MIN_CLONG || v > Misc.MAX_CLONG;
-		value(k, Long.toString(v), quote);
-		return v;
+		value(Long.toString(v), quote);
+		return this;
 	}
 
 	@Override
-	public float FLOAT(String k, float v) throws IOException {
-		value(k, Float.toString(v), false);
-		return v;
+	public Writer FLOAT(float v) throws IOException {
+		value(Float.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public double DOUBLE(String k, double v) throws IOException {
-		value(k, Double.toString(v), false);
-		return v;
+	public Writer DOUBLE(double v) throws IOException {
+		value(Double.toString(v), false);
+		return this;
 	}
 
 	@Override
-	public String STRING(String k, String v) throws IOException {
-		value(k, v, true);
-		return v;
+	public Writer STRING(String v) throws IOException {
+		value(v, true);
+		return this;
 	}
 
 	@Override
@@ -106,54 +115,50 @@ public class Writer implements vant.lang.Writer {
 	}
 
 	@Override
-	public void object(String k, boolean compact) throws IOException {
-		begin(k, compact ? 'a' : 'o');
+	public Writer object() throws IOException {
+		return begin(true);
 	}
 
 	@Override
-	public void array(String k, int n) throws IOException {
-		begin(k, 'a');
+	public Writer tuple() throws IOException {
+		return begin(false);
 	}
 
-	private void begin(String k, char mode) throws IOException {
-		if (_depth == maxdepth)
-			throw new LangError(Json.LANG, "Nesting too deep.");
+	@Override
+	public Writer array(int n) throws IOException {
+		return begin(false);
+	}
+
+	private Writer begin(boolean kv) throws IOException {
+		if (_depth == _nest.length)
+			_nest = Arrays.copyOf(_nest, _depth + 8);
+		if (_kv)
+			throw new LangError(Json.LANG, "Expecting array/object.");
 		if (_comma)
 			_dst.append(',');
-		switch (_mode) {
-		case 'o':
-			if (k == null || k.length() == 0)
-				throw new LangError(Json.LANG, "Key must be non-empty string.");
-			Json.quote(k, _dst);
-			_dst.append(':');
-		case 'i':
-		case 'a':
-			_dst.append(mode == 'o' ? '{' : '[');
-			_stack.set(_depth, mode == 'o');
-			_depth++;
-			_comma = false;
-			_mode = mode;
-			if (mode == 'o')
-				newline();
-			break;
-		default:
-			throw new LangError(Json.LANG, "Misplaced object.");
-		}
+		_comma = false;
+		_nest[_depth] = kv;
+		_depth++;
+		_kv = kv;
+		_dst.append(kv ? '{' : '[');
+		return this;
 	}
 
 	@Override
-	public void end() throws IOException {
-		if (_mode != 'o' && _mode != 'a')
-			throw new LangError(Json.LANG, "Nesting error.");
+	public Writer end() throws IOException {
+		if (_depth == 0)
+			throw new LangError(Json.LANG, "Unexpected end at depth 0.");
 		_depth--;
-		if (_mode == 'o')
-			newline();
-		_dst.append(_mode == 'o' ? '}' : ']');
-		_mode = _depth == 0 ? 'd' : _stack.get(_depth - 1) ? 'o' : 'a';
-		_comma = true;
+		boolean kv = _nest[_depth];
+		if (kv != _kv)
+			throw new LangError(Json.LANG, "Unexpected end after key.");
+		_dst.append(kv ? '}' : ']');
+		finish();
+		return this;
 	}
 
 	@Override
-	public void flush() throws IOException {
+	public Writer flush() throws IOException {
+		return this;
 	}
 }

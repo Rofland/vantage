@@ -50,11 +50,11 @@ public class Json {
 		return string;
 	}
 
-	public static void quote(CharSequence string, Appendable dst)
+	public static Appendable quote(CharSequence string, Appendable dst)
 			throws IOException {
 		if (string == null || string.length() == 0) {
 			dst.append("\"\"");
-			return;
+			return dst;
 		}
 
 		char b;
@@ -107,5 +107,6 @@ public class Json {
 			}
 		}
 		dst.append('"');
+		return dst;
 	}
 }
