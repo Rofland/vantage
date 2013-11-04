@@ -27,8 +27,8 @@ public class Portal {
 		} catch (Usage e) {
 			s.misuse(e.getMessage());
 			return;
-		} catch (RuntimeException e) {
-			s.fault(e);
+		} catch (NumberFormatException e) {
+			s.misuse("Unrecognizable as number." + e.getMessage());
 			return;
 		}
 
