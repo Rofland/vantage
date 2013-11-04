@@ -14,9 +14,8 @@ public class App {
 	public Portal portal(String ap, Struct conf) {
 		Portal portal = portalet.portals.get(ap);
 		if (portal == null) {
-			SyntacticPortal sportal = new JsonPortalRPC();
-			portalet.portals.put(ap, sportal);
-			portal = sportal;
+			portal = new Portal();
+			portalet.portals.put(ap, portal);
 		}
 		return portal;
 	}
