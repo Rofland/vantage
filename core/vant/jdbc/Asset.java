@@ -17,7 +17,7 @@ public class Asset implements vant.app.Asset {
 	@Override
 	public <T extends Tuple> Repo<T> repo(String sym, Mold<T> m)
 			throws Exception {
-		MemRepoJDBC<T> repo = new MemRepoJDBC<T>(m);
+		RepoJDBC<T> repo = new RepoJDBC<T>(m);
 		conf.put("table", sym);
 		repo.conf().extract(conf);
 		ensure(repo);
