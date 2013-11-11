@@ -29,7 +29,7 @@ public class RepoJDBC<T extends Tuple> extends Repo<T> implements
 		super(m);
 	}
 
-	protected void save(int id, T tuple) throws Exception {
+	protected void _save(int id, T tuple) throws Exception {
 		_bin.clear();
 		tuple.encode(_writer);
 		_bin.flip();

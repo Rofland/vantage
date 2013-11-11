@@ -20,12 +20,12 @@ public class Repo<T extends Tuple> {
 		return _count;
 	}
 
-	protected void save(int id, T tuple) throws Exception {
+	protected void _save(int id, T tuple) throws Exception {
 	}
 
 	public int create(T tuple) throws Exception {
 		int id = _count + 1;
-		save(id, tuple);
+		_save(id, tuple);
 		ensureCapacity(_count + 1);
 		T fresh = mold.create();
 		mold.copy(tuple, fresh);
@@ -38,7 +38,7 @@ public class Repo<T extends Tuple> {
 		read(id, proto);
 		if (tuple.equals(proto))
 			return;
-		save(id, tuple);
+		_save(id, tuple);
 		mold.copy(_tuples[id - 1], proto);
 		mold.copy(tuple, _tuples[id - 1]);
 	}
