@@ -8,9 +8,8 @@ import java.sql.Statement;
 
 import vant.Silently;
 import vant.app.Persisted;
-import vant.model.ThinLink;
 
-public class ThinLinkJDBC extends ThinLink implements Persisted<JDBC> {
+public class ThinLink extends vant.model.ThinLink implements Persisted<JDBC> {
 	protected final JDBC _conf = new JDBC();
 	protected PreparedStatement _join, _chop;
 
@@ -85,7 +84,7 @@ public class ThinLinkJDBC extends ThinLink implements Persisted<JDBC> {
 	public State check() throws Exception {
 		Connection conn = _conf.connect();
 		Statement sql = conn.createStatement();
-		
+
 		try {
 			sql.execute("SELECT * FROM " + _conf.table + " LIMIT 1");
 		} catch (SQLSyntaxErrorException e) {

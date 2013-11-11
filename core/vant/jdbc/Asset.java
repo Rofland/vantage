@@ -3,8 +3,6 @@ package vant.jdbc;
 import vant.Mold;
 import vant.app.Persisted;
 import vant.lang.Struct;
-import vant.model.Link;
-import vant.model.Repo;
 import vant.model.Tuple;
 
 public class Asset implements vant.app.Asset {
@@ -15,9 +13,9 @@ public class Asset implements vant.app.Asset {
 	}
 
 	@Override
-	public <T extends Tuple> Repo<T> repo(String sym, Mold<T> m)
+	public <T extends Tuple> vant.model.Repo<T> repo(String sym, Mold<T> m)
 			throws Exception {
-		RepoJDBC<T> repo = new RepoJDBC<T>(m);
+		Repo<T> repo = new Repo<T>(m);
 		conf.put("table", sym);
 		repo.conf().extract(conf);
 		ensure(repo);
@@ -34,8 +32,8 @@ public class Asset implements vant.app.Asset {
 	}
 
 	@Override
-	public Link link(String sym) throws Exception {
-		ThickLinkJDBC link = new ThickLinkJDBC();
+	public vant.model.Link link(String sym) throws Exception {
+		ThickLink link = new ThickLink();
 		conf.put("table", sym);
 		link.conf().extract(conf);
 		ensure(link);

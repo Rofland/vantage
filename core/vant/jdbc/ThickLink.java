@@ -7,9 +7,8 @@ import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
 import vant.app.Persisted;
-import vant.model.ThickLink;
 
-public class ThickLinkJDBC extends ThickLink implements Persisted<JDBC> {
+public class ThickLink extends vant.model.ThickLink implements Persisted<JDBC> {
 	protected final JDBC _conf = new JDBC();
 	protected PreparedStatement _join, _chop;
 

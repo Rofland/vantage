@@ -14,10 +14,9 @@ import vant.Mold;
 import vant.app.Persisted;
 import vant.lang.BufferWriter;
 import vant.lang.StreamReader;
-import vant.model.Repo;
 import vant.model.Tuple;
 
-public class RepoJDBC<T extends Tuple> extends Repo<T> implements
+public class Repo<T extends Tuple> extends vant.model.Repo<T> implements
 		Persisted<JDBC> {
 	protected final JDBC _conf = new JDBC();
 	protected PreparedStatement _insert, _update;
@@ -25,7 +24,7 @@ public class RepoJDBC<T extends Tuple> extends Repo<T> implements
 	protected final vant.lang.Writer _writer = new BufferWriter(_bin);
 	protected final InputStream _bufferInput = Misc.input(_bin);
 
-	public RepoJDBC(Mold<T> m) {
+	public Repo(Mold<T> m) {
 		super(m);
 	}
 
