@@ -1,10 +1,13 @@
 package vant.index;
 
+import vant.model.Sliceable;
 
-public abstract class Rank {
+
+public abstract class Rank implements Sliceable {
 	protected int _count;
 	protected int[] _ids = new int[0];
 
+	@Override
 	public final int slice(int from, int size, int[] ids) {
 		int count = 0;
 		int end = Math.min(from + size, _count);
