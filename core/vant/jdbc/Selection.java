@@ -58,7 +58,7 @@ public class Selection extends vant.model.Selection implements Persisted<JDBC> {
 	public void setup() throws Exception {
 		Connection conn = _conf.connect();
 		Statement sql = conn.createStatement();
-		sql.executeUpdate("CREATE TABLE " + _conf.table + "(id INT)");
+		sql.executeUpdate("CREATE TABLE " + _conf.table + "(id INT PRIMARY KEY)");
 		conn.close();
 	}
 

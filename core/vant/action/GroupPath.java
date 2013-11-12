@@ -5,16 +5,16 @@ import java.io.IOException;
 import vant.Ensure;
 import vant.Usage;
 import vant.lang.Exchange;
-import vant.model.Div;
+import vant.model.Grouping;
 
 public class GroupPath extends Magician {
-	protected final Div _tree;
+	protected final Grouping _tree;
 	protected int _seed;
 	protected byte _hop;
 
-	public GroupPath(Div div, Magic m) {
+	public GroupPath(Grouping g, Magic m) {
 		super(m, Byte.MAX_VALUE);
-		_tree = div;
+		_tree = g;
 	}
 
 	@Override

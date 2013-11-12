@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import vant.Misc;
 
-public class Div implements Relation {
-	protected int[] _divs = Misc.ZERO_INT; // division of a key
+public class Grouping implements Relation {
+	protected int[] _groups = Misc.ZERO_INT; // group of a key
 	protected int[] _kCounts = Misc.ZERO_INT; // size of a division
 	protected int _nonZero;
 
@@ -20,9 +20,9 @@ public class Div implements Relation {
 
 	@Override
 	public void put(int k, int v) throws Exception {
-		if (k > _divs.length)
-			_divs = Arrays.copyOf(_divs, k + 256);
-		int vOld = _divs[k - 1];
+		if (k > _groups.length)
+			_groups = Arrays.copyOf(_groups, k + 256);
+		int vOld = _groups[k - 1];
 		if (vOld == v)
 			return;
 		if (vOld == 0) {
@@ -32,7 +32,7 @@ public class Div implements Relation {
 			update(k, v);
 			_kCounts[vOld - 1]--;
 		}
-		_divs[k - 1] = v;
+		_groups[k - 1] = v;
 		if (v > _kCounts.length)
 			_kCounts = Arrays.copyOf(_kCounts, v + 32);
 		_kCounts[v - 1]++;
@@ -40,17 +40,17 @@ public class Div implements Relation {
 
 	@Override
 	public void cut(int k, int v) throws Exception {
-		int vOld = _divs[k - 1];
+		int vOld = _groups[k - 1];
 		if (vOld == 0 || vOld != v)
 			return;
 		delete(k);
-		_divs[k - 1] = 0;
+		_groups[k - 1] = 0;
 		_kCounts[v - 1]--;
 		_nonZero--;
 	}
 
 	public int value(int id) throws Exception {
-		return _divs[id - 1];
+		return _groups[id - 1];
 	}
 
 	public int countOf(int v) throws Exception {
@@ -68,8 +68,8 @@ public class Div implements Relation {
 			return 0;
 		int index = 0;
 		int toSkip = from;
-		for (int i = 0; i < _divs.length; i++) {
-			if (_divs[i] != v)
+		for (int i = 0; i < _groups.length; i++) {
+			if (_groups[i] != v)
 				continue;
 			if (toSkip > 0) {
 				toSkip--;

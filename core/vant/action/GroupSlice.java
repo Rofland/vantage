@@ -5,22 +5,22 @@ import java.io.IOException;
 import vant.Ensure;
 import vant.Usage;
 import vant.lang.Exchange;
-import vant.model.Div;
+import vant.model.Grouping;
 
 public class GroupSlice extends Magician {
-	protected final Div _div;
+	protected final Grouping _grouping;
 	protected int _offset;
 	protected byte _size;
 	protected int _group;
 
-	public GroupSlice(Div div, Magic m) {
+	public GroupSlice(Grouping g, Magic m) {
 		super(m, Byte.MAX_VALUE);
-		_div = div;
+		_grouping = g;
 	}
 
 	@Override
 	public void perform() throws Exception {
-		_count = _div.rlist(_group, _offset, _size, _ids);
+		_count = _grouping.rlist(_group, _offset, _size, _ids);
 		_magic.turn(_ids, 0, _count);
 	}
 

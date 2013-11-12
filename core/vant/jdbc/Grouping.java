@@ -10,7 +10,7 @@ import java.util.Arrays;
 import vant.Ensure;
 import vant.app.Persisted;
 
-public class Div extends vant.model.Div implements Persisted<JDBC> {
+public class Grouping extends vant.model.Grouping implements Persisted<JDBC> {
 	protected final JDBC _conf = new JDBC();
 	protected PreparedStatement _insert, _update, _delete;
 
@@ -52,12 +52,12 @@ public class Div extends vant.model.Div implements Persisted<JDBC> {
 		rs.next();
 		int max = rs.getInt(1);
 		rs.close();
-		_divs = new int[max + 64];
+		_groups = new int[max + 64];
 		rs = sql.executeQuery("SELECT k,v FROM " + _conf.table + " ORDER BY k");
 		while (rs.next()) {
 			int k = Ensure.id("k", rs.getInt(1));
 			int v = Ensure.range("v", rs.getInt(2), 0, Integer.MAX_VALUE);
-			_divs[k - 1] = v;
+			_groups[k - 1] = v;
 			_nonZero++;
 			if (v > _kCounts.length)
 				_kCounts = Arrays.copyOf(_kCounts, v + 32);

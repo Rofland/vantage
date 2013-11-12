@@ -23,12 +23,12 @@ public class Asset implements vant.app.Asset {
 	}
 
 	@Override
-	public vant.model.Div div(String sym) throws Exception {
-		Div div = new Div();
+	public vant.model.Grouping grouping(String sym) throws Exception {
+		Grouping g = new Grouping();
 		conf.put("table", sym);
-		div.conf().extract(conf);
-		ensure(div);
-		return div;
+		g.conf().extract(conf);
+		ensure(g);
+		return g;
 	}
 
 	@Override
