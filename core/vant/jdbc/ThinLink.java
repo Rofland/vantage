@@ -3,14 +3,13 @@ package vant.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
-import vant.Silently;
-import vant.app.Persisted;
+import vant.app.Store;
 
-public class ThinLink extends vant.model.ThinLink implements Persisted<JDBC> {
-	protected final JDBC _conf = new JDBC();
+public class ThinLink extends vant.model.ThinLink implements Store {
+	protected final Connection _conn;
+	protected final String _table;
 	protected PreparedStatement _join, _chop;
 
 	protected void save(int src, int dst) throws Exception {
@@ -25,28 +24,27 @@ public class ThinLink extends vant.model.ThinLink implements Persisted<JDBC> {
 		_chop.execute();
 	}
 
-	@Override
-	public JDBC conf() {
-		return _conf;
+	public ThinLink(Connection c, String table) {
+		this._conn = c;
+		this._table = table;
 	}
 
 	@Override
 	public void open() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _conf.table);
+		Statement sql = _conn.createStatement();
+		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _table);
 		_count = rs.next() ? rs.getInt(1) : 0;
 		if (_count == 0)
 			return;
 		rs.close();
 		_pairs = new long[_count & 0xfffffe00 + 512];
 
-		rs = sql.executeQuery("SELECT MAX(src) FROM " + _conf.table);
+		rs = sql.executeQuery("SELECT MAX(src) FROM " + _table);
 		rs.next();
 		_sizes = new int[rs.getInt(1) & 0xffffff00 + 256];
 		rs.close();
 
-		rs = sql.executeQuery("SELECT src, dst FROM " + _conf.table);
+		rs = sql.executeQuery("SELECT src, dst FROM " + _table);
 		for (int i = 0; i < _count; i++) {
 			rs.next();
 			int src = rs.getInt(1);
@@ -57,49 +55,29 @@ public class ThinLink extends vant.model.ThinLink implements Persisted<JDBC> {
 		rs.close();
 		sql.close();
 
-		_join = conn.prepareStatement("INSERT INTO " + _conf.table
+		_join = _conn.prepareStatement("INSERT INTO " + _table
 				+ "(src,dst) VALUE(?,?)");
-		_chop = conn.prepareStatement("DELETE FROM " + _conf.table
+		_chop = _conn.prepareStatement("DELETE FROM " + _table
 				+ " WHERE src=? AND dst=?");
 	}
 
 	@Override
 	public void setup() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("CREATE TABLE " + _conf.table
+		Statement sql = _conn.createStatement();
+		sql.execute("CREATE TABLE " + _table
 				+ "(src INT, dst INT, PRIMARY KEY(src, dst)");
-		Silently.close(conn);
+		sql.close();
 	}
 
 	@Override
 	public void erase() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("DROP TABLE " + _conf.table);
-		Silently.close(conn);
+		JDBC.drop(_conn, _table);
 	}
 
 	@Override
-	public State check() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-
-		try {
-			sql.execute("SELECT * FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.NOT_EXIST;
-		}
-
-		try {
-			sql.execute("SELECT src, dst FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.INVALID;
-		}
-
-		conn.close();
-		return State.OK;
+	public void check() throws Exception {
+		Statement sql = _conn.createStatement();
+		sql.execute("SELECT src, dst FROM " + _table + " LIMIT 1");
+		sql.close();
 	}
 }

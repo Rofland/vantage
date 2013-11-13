@@ -3,14 +3,19 @@ package vant.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
-import vant.app.Persisted;
+import vant.app.Store;
 
-public class Selection extends vant.model.Selection implements Persisted<JDBC> {
-	protected final JDBC _conf = new JDBC();
+public class Selection extends vant.model.Selection implements Store {
+	protected final Connection _conn;
+	protected final String _table;
 	protected PreparedStatement _insert, _delete, _deleteAll;
+
+	public Selection(Connection c, String table) {
+		this._conn = c;
+		this._table = table;
+	}
 
 	protected void _add(int id) throws Exception {
 		_insert.setInt(1, id);
@@ -27,27 +32,20 @@ public class Selection extends vant.model.Selection implements Persisted<JDBC> {
 	}
 
 	@Override
-	public JDBC conf() {
-		return _conf;
-	}
-
-	@Override
 	public void open() throws Exception {
-		Connection conn = _conf.connect();
-		_insert = conn.prepareStatement("INSERT INTO " + _conf.table
-				+ "VALUE(?)");
-		_delete = conn.prepareStatement("DELETE FROM " + _conf.table
-				+ " WHRE id=?");
-		_deleteAll = conn.prepareStatement("DELETE FROM " + _conf.table);
+		_insert = _conn.prepareStatement("INSERT INTO " + _table + "VALUE(?)");
+		_delete = _conn
+				.prepareStatement("DELETE FROM " + _table + " WHRE id=?");
+		_deleteAll = _conn.prepareStatement("DELETE FROM " + _table);
 
-		Statement sql = conn.createStatement();
-		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _conf.table);
+		Statement sql = _conn.createStatement();
+		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _table);
 		int n = rs.next() ? rs.getInt(1) : 0;
 		rs.close();
 		if (n == 0)
 			return;
 		_ids = new int[n + 20];
-		rs = sql.executeQuery("SELECT id FROM " + _conf.table);
+		rs = sql.executeQuery("SELECT id FROM " + _table);
 		while (rs.next())
 			_ids[_count++] = rs.getInt(1);
 		rs.close();
@@ -56,37 +54,20 @@ public class Selection extends vant.model.Selection implements Persisted<JDBC> {
 
 	@Override
 	public void setup() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.executeUpdate("CREATE TABLE " + _conf.table + "(id INT PRIMARY KEY)");
-		conn.close();
+		Statement sql = _conn.createStatement();
+		sql.executeUpdate("CREATE TABLE " + _table + "(id INT PRIMARY KEY)");
+		sql.close();
 	}
 
 	@Override
 	public void erase() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("DROP TABLE IF EXISTS " + _conf.table);
-		conn.close();
+		JDBC.drop(_conn, _table);
 	}
 
 	@Override
-	public Persisted.State check() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		try {
-			sql.execute("SELECT * FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.NOT_EXIST;
-		}
-		try {
-			sql.execute("SELECT id FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.clearWarnings();
-			return State.INVALID;
-		}
-		conn.close();
-		return State.OK;
+	public void check() throws Exception {
+		Statement sql = _conn.createStatement();
+		sql.execute("SELECT id FROM " + _table + " LIMIT 1");
+		sql.close();
 	}
 }

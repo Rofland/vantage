@@ -1,31 +1,35 @@
 package vant.jdbc;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLSyntaxErrorException;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import vant.Misc;
 import vant.Mold;
-import vant.app.Persisted;
+import vant.Usage;
 import vant.lang.BufferWriter;
 import vant.lang.StreamReader;
 import vant.model.Tuple;
 
 public class Repo<T extends Tuple> extends vant.model.Repo<T> implements
-		Persisted<JDBC> {
-	protected final JDBC _conf = new JDBC();
+		vant.app.Store {
+	protected final Connection _conn;
+	protected final String _table;
 	protected PreparedStatement _insert, _update;
 	protected final ByteBuffer _bin = ByteBuffer.allocate(proto.binaryLimit());
 	protected final vant.lang.Writer _writer = new BufferWriter(_bin);
 	protected final InputStream _bufferInput = Misc.input(_bin);
 
-	public Repo(Mold<T> m) {
+	public Repo(Mold<T> m, Connection c, String table) {
 		super(m);
+		this._conn = c;
+		this._table = table;
 	}
 
 	protected void _save(int id, T tuple) throws Exception {
@@ -40,26 +44,20 @@ public class Repo<T extends Tuple> extends vant.model.Repo<T> implements
 	}
 
 	@Override
-	public JDBC conf() {
-		return _conf;
-	}
-
-	@Override
-	public void open() throws Exception {
-		Connection conn = _conf.connect();
-		_insert = conn.prepareStatement("INSERT INTO " + _conf.table
+	public void open() throws SQLException, IOException, Usage {
+		_insert = _conn.prepareStatement("INSERT INTO " + _table
 				+ "(tuple, id) VALUE(?,?)");
-		_update = conn.prepareStatement("UPDATE " + _conf.table
+		_update = _conn.prepareStatement("UPDATE " + _table
 				+ " SET tuple=? WHERE id=?");
 
-		Statement sql = conn.createStatement();
-		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _conf.table);
+		Statement sql = _conn.createStatement();
+		ResultSet rs = sql.executeQuery("SELECT COUNT(*) FROM " + _table);
 		int count = rs.next() ? rs.getInt(1) : 0;
 		if (count == 0)
 			return;
 		ensureCapacity(count);
 		StreamReader reader = new StreamReader(null);
-		rs = sql.executeQuery("SELECT id, tuple FROM " + _conf.table);
+		rs = sql.executeQuery("SELECT id, tuple FROM " + _table);
 		for (int i = 0; i < count; i++) {
 			rs.next();
 			int id = rs.getInt(1);
@@ -71,46 +69,27 @@ public class Repo<T extends Tuple> extends vant.model.Repo<T> implements
 			_tuples[id - 1] = tuple;
 		}
 		_count = count;
+		sql.close();
 	}
 
 	@Override
-	public void setup() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("CREATE TABLE " + _conf.table
+	public void setup() throws SQLException {
+		Statement sql = _conn.createStatement();
+		sql.execute("CREATE TABLE " + _table
 				+ "(id INT PRIMARY KEY, tuple VARBINARY(" + proto.binaryLimit()
 				+ "))");
-		conn.close();
+		sql.close();
 	}
 
 	@Override
-	public void erase() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("DROP TABLE IF EXISTS " + _conf.table);
-		conn.close();
+	public void erase() throws SQLException {
+		JDBC.drop(_conn, _table);
 	}
 
 	@Override
-	public State check() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-
-		try {
-			sql.execute("SELECT * FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.NOT_EXIST;
-		}
-
-		try {
-			sql.execute("SELECT id, tuple FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.INVALID;
-		}
-
-		conn.close();
-		return State.OK;
+	public void check() throws SQLException {
+		Statement sql = _conn.createStatement();
+		sql.execute("SELECT id, tuple FROM " + _table + " LIMIT 1");
+		sql.close();
 	}
 }

@@ -3,14 +3,19 @@ package vant.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
-import vant.app.Persisted;
+import vant.app.Store;
 
-public class ThickLink extends vant.model.ThickLink implements Persisted<JDBC> {
-	protected final JDBC _conf = new JDBC();
+public class ThickLink extends vant.model.ThickLink implements Store {
+	protected final Connection _conn;
+	protected final String _table;
 	protected PreparedStatement _join, _chop;
+
+	public ThickLink(Connection c, String table) {
+		this._conn = c;
+		this._table = table;
+	}
 
 	protected void save(int src, int dst) throws Exception {
 		_join.setInt(1, src);
@@ -25,68 +30,42 @@ public class ThickLink extends vant.model.ThickLink implements Persisted<JDBC> {
 	}
 
 	@Override
-	public JDBC conf() {
-		return _conf;
-	}
-
-	@Override
 	public void open() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		ResultSet rs = sql.executeQuery("SELECT MAX(src) FROM " + _conf.table);
+		Statement sql = _conn.createStatement();
+		ResultSet rs = sql.executeQuery("SELECT MAX(src) FROM " + _table);
 		rs.next();
 		_sizes = new int[rs.getInt(1) & 0xffffffc0 + 64];
 		rs.close();
 
-		rs = sql.executeQuery("SELECT * FROM " + _conf.table);
+		rs = sql.executeQuery("SELECT * FROM " + _table);
 		while (rs.next())
 			put(rs.getInt("src"), rs.getInt("dst"));
 		rs.close();
 		sql.close();
 
-		_join = conn.prepareStatement("INSERT INTO " + _conf.table
+		_join = _conn.prepareStatement("INSERT INTO " + _table
 				+ "(src,dst) VALUE(?,?)");
-		_chop = conn.prepareStatement("DELETE FROM " + _conf.table
+		_chop = _conn.prepareStatement("DELETE FROM " + _table
 				+ " WHERE src=? AND dst=?");
 	}
 
 	@Override
 	public void setup() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("CREATE TABLE " + _conf.table
+		Statement sql = _conn.createStatement();
+		sql.execute("CREATE TABLE " + _table
 				+ "(src INT, dst INT, PRIMARY KEY(src, dst)");
-		conn.close();
+		sql.close();
 	}
 
 	@Override
 	public void erase() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-		sql.execute("DROP TABLE " + _conf.table);
-		conn.close();
+		JDBC.drop(_conn, _table);
 	}
 
 	@Override
-	public State check() throws Exception {
-		Connection conn = _conf.connect();
-		Statement sql = conn.createStatement();
-
-		try {
-			sql.execute("SELECT * FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.NOT_EXIST;
-		}
-
-		try {
-			sql.execute("SELECT src, dst FROM " + _conf.table + " LIMIT 1");
-		} catch (SQLSyntaxErrorException e) {
-			conn.close();
-			return State.INVALID;
-		}
-
-		conn.close();
-		return State.OK;
+	public void check() throws Exception {
+		Statement sql = _conn.createStatement();
+		sql.execute("SELECT src, dst FROM " + _table + " LIMIT 1");
+		sql.close();
 	}
 }
