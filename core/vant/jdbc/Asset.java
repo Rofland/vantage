@@ -10,7 +10,7 @@ import vant.Usage;
 import vant.app.Store;
 import vant.model.Tuple;
 
-public class Asset implements vant.app.Asset {
+public class Asset implements vant.app.App.Asset {
 	protected final JDBC _conf;
 	protected final Connection _conn;
 	protected final Map<String, Store> _stores = new HashMap<String, Store>();
@@ -21,39 +21,48 @@ public class Asset implements vant.app.Asset {
 	}
 
 	@Override
-	public <T extends Tuple> vant.model.Repo<T> repo(String sym, Mold<T> m)
+	public <T extends Tuple> vant.model.Repo<T> repo(String sym, Mold<T> m,
+			boolean runtime) throws Exception {
+		if (_stores.containsKey(sym))
+			throw new Usage(sym, "Already exist.");
+		return runtime ? new vant.model.Repo<T>(m) : ensure(sym, new Repo<T>(m,
+				_conn, sym));
+	}
+
+	@Override
+	public vant.model.Grouping grouping(String sym, boolean runtime)
 			throws Exception {
 		if (_stores.containsKey(sym))
 			throw new Usage(sym, "Already exist.");
-		Repo<T> repo = new Repo<T>(m, _conn, sym);
-		ensure(repo);
-		return repo;
+		return runtime ? new vant.model.Grouping() : ensure(sym, new Grouping(
+				_conn, sym));
 	}
 
 	@Override
-	public vant.model.Grouping grouping(String sym) throws Exception {
+	public vant.model.Link link(String sym, boolean runtime) throws Exception {
 		if (_stores.containsKey(sym))
 			throw new Usage(sym, "Already exist.");
-		Grouping g = new Grouping(_conn, sym);
-		ensure(g);
-		return g;
+		return runtime ? new vant.model.ThickLink() : ensure(sym,
+				new ThickLink(_conn, sym));
 	}
 
 	@Override
-	public vant.model.Link link(String sym) throws Exception {
+	public vant.model.Selection selection(String sym, boolean runtime)
+			throws Exception {
 		if (_stores.containsKey(sym))
 			throw new Usage(sym, "Already exist.");
-		ThickLink link = new ThickLink(_conn, sym);
-		ensure(link);
-		return link;
+		return runtime ? new vant.model.Selection() : ensure(sym,
+				new Selection(_conn, sym));
 	}
 
-	protected static void ensure(Store store) throws Exception {
+	protected <S extends Store> S ensure(String sym, S store) throws Exception {
 		try {
 			store.check();
 		} catch (Exception e) {
 			store.setup();
 		}
 		store.open();
+		_stores.put(sym, store);
+		return store;
 	}
 }

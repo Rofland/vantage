@@ -1,37 +1,30 @@
 package vant.app;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.webapp.WebAppContext;
+import vant.Mold;
+import vant.action.Action;
+import vant.model.Grouping;
+import vant.model.Link;
+import vant.model.Repo;
+import vant.model.Selection;
+import vant.model.Tuple;
 
-import vant.Norm;
-import vant.lang.Struct;
+public interface App {
+	public interface Access {
+		void action(String sym, Action a);
 
-public class App {
-	protected final Portalet portalet = new Portalet();
-
-	public Portal portal(String ap, Struct conf) {
-		Portal portal = portalet.portals.get(ap);
-		if (portal == null) {
-			portal = new Portal();
-			portalet.portals.put(ap, portal);
-		}
-		return portal;
+		Action action(String sym);
 	}
 
-	public void launch(String root, Struct conf) throws Exception {
-		Server server = new Server(Norm.INT(conf.value("port"), 8100));
+	public interface Asset {
+		<T extends Tuple> Repo<T> repo(String sym, Mold<T> m, boolean runtime)
+				throws Exception;
 
-		Context servletContext = new Context();
-		servletContext.setAllowNullPathInfo(true);
-		servletContext.setContextPath("/api");
-		servletContext.addServlet(new ServletHolder(portalet), "/");
-		server.addHandler(servletContext);
+		Grouping grouping(String sym, boolean runtime) throws Exception;
 
-		WebAppContext ui = new WebAppContext(root, "/");
-		server.addHandler(ui);
+		Link link(String sym, boolean runtime) throws Exception;
 
-		server.start();
+		Selection selection(String sym, boolean runtime) throws Exception;
 	}
+
+	void init(Access access, Asset asset) throws Exception;
 }
