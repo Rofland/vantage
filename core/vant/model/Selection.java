@@ -13,28 +13,18 @@ public class Selection implements Sliceable {
 		return _count;
 	}
 
-	protected void _add(int id) throws Exception {
-	}
-
-	protected void _evict(int id) throws Exception {
-	}
-
-	protected void _clear() throws Exception {
-	}
-
 	@Override
-	public int slice(int from, int size, int[] ids) throws Exception {
+	public int slice(int from, int size, int[] ids) {
 		int n = Math.min(size, _count - from);
 		for (int i = 0; i < n; i++)
 			ids[i] = _ids[from + i];
 		return n;
 	}
 
-	public void add(int id) throws Exception {
+	public boolean add(int id) {
 		int index = Arrays.binarySearch(_ids, id);
 		if (index >= 0)
-			return;
-		_add(id);
+			return false;
 		index = -index - 1;
 		int[] dst = _ids;
 		if (_count == _ids.length) {
@@ -45,25 +35,26 @@ public class Selection implements Sliceable {
 		dst[index] = id;
 		_ids = dst;
 		_count++;
+		return true;
 	}
 
-	public void evict(int id) throws Exception {
+	public boolean evict(int id) {
 		int index = Arrays.binarySearch(_ids, id);
 		if (index < 0)
-			return;
-		_evict(id);
+			return false;
 		_count--;
 		System.arraycopy(_ids, index, _ids, index + 1, _count - index);
+		return true;
 	}
 
-	public void clear() throws Exception {
+	public boolean clear() {
 		if (_count == 0)
-			return;
-		_clear();
+			return false;
 		_count = 0;
+		return true;
 	}
 
-	public boolean has(int... ids) throws Exception {
+	public boolean has(int... ids) {
 		for (int id : ids)
 			if (Arrays.binarySearch(_ids, id) < 0)
 				return false;

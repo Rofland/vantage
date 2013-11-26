@@ -20,12 +20,8 @@ public class Repo<T extends Tuple> {
 		return _count;
 	}
 
-	protected void _save(int id, T tuple) throws Exception {
-	}
-
-	public int create(T tuple) throws Exception {
+	public int create(T tuple) {
 		int id = _count + 1;
-		_save(id, tuple);
 		ensureCapacity(_count + 1);
 		T fresh = mold.create();
 		mold.copy(tuple, fresh);
@@ -34,13 +30,13 @@ public class Repo<T extends Tuple> {
 		return id;
 	}
 
-	public void update(int id, T tuple) throws Exception {
+	public boolean update(int id, T tuple) {
 		read(id, proto);
 		if (tuple.equals(proto))
-			return;
-		_save(id, tuple);
+			return false;
 		mold.copy(_tuples[id - 1], proto);
 		mold.copy(tuple, _tuples[id - 1]);
+		return true;
 	}
 
 	public void load(int[] ids, int off1, T[] tuples, int off2, int n) {

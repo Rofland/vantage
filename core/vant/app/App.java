@@ -3,7 +3,6 @@ package vant.app;
 import vant.Mold;
 import vant.action.Action;
 import vant.model.Grouping;
-import vant.model.Link;
 import vant.model.Repo;
 import vant.model.Selection;
 import vant.model.Tuple;
@@ -20,8 +19,6 @@ public interface App {
 				throws Exception;
 
 		Grouping grouping(String sym, boolean runtime) throws Exception;
-
-		Link link(String sym, boolean runtime) throws Exception;
 
 		Selection selection(String sym, boolean runtime) throws Exception;
 	}

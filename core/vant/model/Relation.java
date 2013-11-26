@@ -1,7 +1,7 @@
 package vant.model;
 
 public interface Relation {
-	void put(int k, int v) throws Exception;
+	boolean put(int k, int v);
 
-	void cut(int k, int v) throws Exception;
+	boolean cut(int k, int v);
 }
