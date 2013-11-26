@@ -8,6 +8,7 @@ public class Selection implements Sliceable {
 	protected int _count;
 	protected int[] _ids = Misc.ZERO_INT;
 
+	@Override
 	public final int count() {
 		return _count;
 	}
@@ -21,6 +22,7 @@ public class Selection implements Sliceable {
 	protected void _clear() throws Exception {
 	}
 
+	@Override
 	public int slice(int from, int size, int[] ids) throws Exception {
 		int n = Math.min(size, _count - from);
 		for (int i = 0; i < n; i++)

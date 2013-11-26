@@ -15,4 +15,9 @@ public abstract class Rank implements Sliceable {
 			ids[count] = _ids[i];
 		return count;
 	}
+	
+	@Override
+	public int count() {
+		return _count;
+	}
 }
