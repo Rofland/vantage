@@ -2,7 +2,6 @@ package vant.index;
 
 import vant.model.Sliceable;
 
-
 public abstract class Rank implements Sliceable {
 	protected int _count;
 	protected int[] _ids = new int[0];
@@ -15,7 +14,7 @@ public abstract class Rank implements Sliceable {
 			ids[count] = _ids[i];
 		return count;
 	}
-	
+
 	@Override
 	public int count() {
 		return _count;

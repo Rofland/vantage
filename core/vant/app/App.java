@@ -2,9 +2,9 @@ package vant.app;
 
 import vant.Mold;
 import vant.action.Action;
-import vant.model.Grouping;
+import vant.mem.Grouping;
+import vant.mem.IS;
 import vant.model.Repo;
-import vant.model.Selection;
 import vant.model.Tuple;
 
 public interface App {
@@ -20,7 +20,7 @@ public interface App {
 
 		Grouping grouping(String sym, boolean runtime) throws Exception;
 
-		Selection selection(String sym, boolean runtime) throws Exception;
+		IS selection(String sym, boolean runtime) throws Exception;
 	}
 
 	void init(Access access, Asset asset) throws Exception;

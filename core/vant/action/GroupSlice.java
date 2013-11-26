@@ -5,7 +5,7 @@ import java.io.IOException;
 import vant.Ensure;
 import vant.Usage;
 import vant.lang.Exchange;
-import vant.model.Grouping;
+import vant.mem.Grouping;
 
 public class GroupSlice extends Magician {
 	protected final Grouping _grouping;

@@ -7,8 +7,8 @@ import vant.Usage;
 import vant.Violation;
 import vant.lang.Exchange;
 import vant.lang.Writer;
+import vant.mem.Repo;
 import vant.model.Relation;
-import vant.model.Repo;
 
 public class Put extends Action {
 	protected final Relation _relation;
