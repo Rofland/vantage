@@ -6,15 +6,12 @@ import vant.Mold;
 import vant.model.Tuple;
 
 public class Repo<T extends Tuple> extends vant.model.Repo<T> {
-	public final Mold<T> mold;
-	public final T proto;
 	protected T[] _tuples;
 	protected int _count;
 
-	public Repo(Mold<T> mold) {
-		this.mold = mold;
-		this.proto = mold.create();
-		_tuples = mold.array(0);
+	public Repo(Mold<T> m) {
+		super(m);
+		_tuples = m.array(0);
 	}
 
 	@Override

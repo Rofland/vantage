@@ -1,6 +1,15 @@
 package vant.model;
 
+import vant.Mold;
+
 public abstract class Repo<T extends Tuple> implements Countable {
+	public final Mold<T> mold;
+	public final T proto;
+
+	public Repo(Mold<T> m) {
+		this.mold = m;
+		this.proto = m.create();
+	}
 
 	public abstract int create(T t);
 

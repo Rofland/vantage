@@ -20,7 +20,7 @@ public class GroupSlice extends Magician {
 
 	@Override
 	public void perform() throws Exception {
-		_count = _grouping.rlist(_group, _offset, _size, _ids);
+		_count = _grouping.list(_group, _offset, _size, _ids);
 		_magic.turn(_ids, 0, _count);
 	}
 
